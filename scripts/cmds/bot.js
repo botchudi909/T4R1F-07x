@@ -2,12 +2,12 @@ const axios = require("axios");
 
 const API = "https://api.noobs-api.rf.gd/dipto";
 
-const prefixes = ["bby"," বেবি","bot","বট","botli","baby","babu","বাবু","bbu","বটলি","babe","হাই","hi","hlw","tarif","vodro","ovodro","fatima","liza"];
+const prefixes = ["bby"," বেবি","bot","বট","botli","baby","babu","বাবু","bbu","বটলি","babe","হাই","hi","hlw","tarif","vodro","ovodro","fatima","zem"];
 
-const reacts = ["❤️"," 🤑","🙈","🐣","🌸","💙","🖤","🤍","😍","😘","😎","🐸"," 🌀","🤬","❤️‍🩹","🐍","🥹","😇","😆","🥰","😂","🤖"];
+const reacts = ["❤"," 🤑","🙈","🐣","🌸","💙","🖤","🤍","😍","😘","😎","🐸"," 🌀","🤬","❤‍🩹","🐍","🥹","😇","😆","🥰","😂","🤖"];
 
 const tarif = [
-"এই নেও পটিয়ে দেখাও m.me/61552422054139 ",
+"এই নেও পটিয়ে দেখাও mY ′বস′ m.me/100030851045383",
 "বলেন sir___😌",
 "বলেন ম্যাডাম__😌",
 "ওই মামা_আর ডাকিস না প্লিজ__😡🙂",
@@ -16,7 +16,7 @@ const tarif = [
 "🍺 এই নাও জুস খাও..! Bby বলতে বলতে হাপায় গেছো না 🥲",
 "Beshi dakle ammu boka diba to__🥺",
 "আজকে আমার মন ভালো নেই__🙉",
-"[███████]100%",
+"এতো বট`বট না করে আমার বস'TARIF TARIF'তো করতে পারিস__👿🫠",
 "ভুলে জাও আমাকে_____😞😞",
 "কথা দেও আমাকে পটাবা...!! 😌",
 "আমি অন্যের জিনিসের সাথে কথা বলি না__😏 ওকে",
@@ -57,36 +57,51 @@ config: {
 
 onStart(){},
 
-async onReply({api,event}){
+async onReply({ api, event }) {
+
+  if (!event.messageReply) return;
+
+  const replyData = global.GoatBot.onReply.get(event.messageReply.messageID);
+
+  if (!replyData) return;
+  if (replyData.author !== event.senderID) return;
+
+  global.GoatBot.onReply.delete(event.messageReply.messageID);
 
   const text = cut(event.body) || "hi";
 
-  const msg = await ask(text,event.senderID);
+  const msg = await ask(text, event.senderID);
 
-  api.setMessageReaction(rand(reacts), event.messageID,()=>{},true);
+  api.setMessageReaction(rand(reacts), event.messageID, () => {}, true);
 
-  api.sendMessage(msg,event.threadID,(e,i)=>{
-    if(!e){
-      global.GoatBot.onReply.set(i.messageID,{
-        commandName:"bot",
-        author:event.senderID
+  api.sendMessage(msg, event.threadID, (e, i) => {
+    if (!e) {
+      global.GoatBot.onReply.set(i.messageID, {
+        commandName: "bot",
+        author: event.senderID
       });
     }
-  },event.messageID);
+  }, event.messageID);
 
 },
 
-async onChat({api,event}){
+async onChat({ api, event }) {
 
-  if(!event.body || event.senderID==api.getCurrentUserID()) return;
+  if (
+    event.type !== "message" ||
+    !event.body ||
+    event.senderID == api.getCurrentUserID()
+  ) return;
 
   const low = event.body.toLowerCase();
 
-  if(!prefixes.some(p=>low.startsWith(p))) return;
+  if (!prefixes.some(p => low.startsWith(p))) return;
+
+  if (global.GoatBot.onReply.has(event.messageID)) return;
 
   const text = cut(low);
 
-  api.setMessageReaction(rand(reacts), event.messageID,()=>{},true);
+  api.setMessageReaction(rand(reacts), event.messageID, () => {}, true);
 
   const name = (await api.getUserInfo(event.senderID))[event.senderID].name;
 
